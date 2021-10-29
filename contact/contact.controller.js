@@ -4,7 +4,10 @@ const {
 } = require("mongoose");
 
 async function qetContacts(req, res) {
-  const contacts = await Contact.find();
+  const contacts = await Contact.aggregate([{
+    $lookup: {
+    from:
+  }}]);
   res.json(contacts);
 }
 
@@ -13,7 +16,9 @@ async function getContactById(req, res) {
     const {
       params: { contactId },
     } = req;
-    const findedContact = await Contact.findById(contactId);
+    const owner = req.user._id;
+    const query = { contactId, owner };
+    const findedContact = await Contact.findOne({ contactId, owner });
     if (!findedContact) {
       return res.status(400).send("Not found");
     }
@@ -25,9 +30,9 @@ async function getContactById(req, res) {
 
 async function addContact(req, res) {
   try {
-    const { body } = req;
+    const { body, user } = req;
 
-    const contact = await Contact.create(body);
+    const contact = await Contact.create({...body, owner: user._id});
     return res.status(201).send(contact);
   } catch (error) {
     res.status(400).send(error);
