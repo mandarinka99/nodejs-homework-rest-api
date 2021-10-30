@@ -7,15 +7,13 @@ const User = require("./User");
 
 async function signUp(req, res) {
   try {
-    const {
-      body: { email, password },
-    } = req;
-    const foundUser = await User.findOne({ email });
+    const { body } = req;
+    const foundUser = await User.findOne({ email: body.email });
     if (foundUser) {
       return res.status(409).send("Email in use");
     }
 
-    const hashedPassword = await bcrypt.hash(password, 2);
+    const hashedPassword = await bcrypt.hash(body.password, 2);
     const user = await User.create({
       ...body,
       password: hashedPassword,
@@ -76,9 +74,26 @@ async function getCurrentUser(req, res) {
   }
 }
 
+async function updateUserSubscription(req, res) {
+  try {
+    const {
+      user: { _id },
+      body,
+    } = req;
+
+    const constUpdatedSubscription = await User.findByIdAndUpdate(_id, body, {
+      new: true,
+    });
+    return res.status(200).send(constUpdatedSubscription);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+}
+
 module.exports = {
   login,
   signUp,
   logout,
   getCurrentUser,
+  updateUserSubscription,
 };

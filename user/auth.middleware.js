@@ -15,11 +15,8 @@ async function autorize(req, res, next) {
   try {
     const payload = await jwt.verify(token, process.env.JWT_SECRET);
     const { userId } = payload;
-    console.log(`userId`, userId);
 
     const user = await User.findById(userId);
-
-    console.log(`user`, user);
 
     if (!user) {
       return res.status(401).send({
