@@ -1,9 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const morgan = require("morgan");
 const logger = require("morgan");
 const cors = require("cors");
 const contactRouter = require("./contact/contact.routers");
+const userRouter = require("./user/user.routers");
 
 dotenv.config();
 
@@ -29,9 +31,11 @@ function connectMiddlewares(app) {
   app.use(logger(formatsLogger));
   app.use(cors());
   app.use(express.json());
+  app.use(morgan("combined"));
 }
 
 function declareRoutes(app) {
+  app.use("/users", userRouter);
   app.use("/contacts", contactRouter);
 }
 

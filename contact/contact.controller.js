@@ -4,7 +4,8 @@ const {
 } = require("mongoose");
 
 async function qetContacts(req, res) {
-  const contacts = await Contact.find();
+  const owner = req.user._id;
+  const contacts = await Contact.find({ owner });
   res.json(contacts);
 }
 
@@ -13,7 +14,8 @@ async function getContactById(req, res) {
     const {
       params: { contactId },
     } = req;
-    const findedContact = await Contact.findById(contactId);
+    const owner = req.user._id;
+    const findedContact = await Contact.findOne({ _id: contactId, owner });
     if (!findedContact) {
       return res.status(400).send("Not found");
     }
@@ -25,9 +27,9 @@ async function getContactById(req, res) {
 
 async function addContact(req, res) {
   try {
-    const { body } = req;
+    const { body, user } = req;
 
-    const contact = await Contact.create(body);
+    const contact = await Contact.create({ ...body, owner: user._id });
     return res.status(201).send(contact);
   } catch (error) {
     res.status(400).send(error);
@@ -36,11 +38,12 @@ async function addContact(req, res) {
 
 async function updateContact(req, res) {
   try {
+    const owner = req.user._id;
     const {
       params: { contactId },
     } = req;
-    const updatedContact = await Contact.findByIdAndUpdate(
-      contactId,
+    const updatedContact = await Contact.findOneAndUpdate(
+      { _id: contactId, owner },
       req.body,
       {
         new: true,
@@ -60,7 +63,11 @@ async function removeContact(req, res) {
     const {
       params: { contactId },
     } = req;
-    const deletedContact = await Contact.findByIdAndDelete(contactId);
+    const owner = req.user._id;
+    const deletedContact = await Contact.findOneAndRemove({
+      _id: contactId,
+      owner,
+    });
     if (!deletedContact) {
       return res.status(400).send("Not found");
     }
@@ -72,11 +79,12 @@ async function removeContact(req, res) {
 
 async function updateStatusContact(req, res) {
   try {
+    const owner = req.user._id;
     const {
       params: { contactId },
     } = req;
-    const updatedStatusContact = await Contact.findByIdAndUpdate(
-      contactId,
+    const updatedStatusContact = await Contact.findOneAndUpdate(
+      { _id: contactId, owner },
       req.body,
       {
         new: true,
