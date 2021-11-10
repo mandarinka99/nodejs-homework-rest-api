@@ -9,7 +9,7 @@ const userRouter = require("./user/user.routers");
 
 dotenv.config();
 
-const PORT = process.env.PORT || 3030;
+const PORT = process.env.PORT || 3031;
 const MONGO_URL = process.env.MONGO_URL;
 
 start();
@@ -29,8 +29,9 @@ function initServer() {
 function connectMiddlewares(app) {
   const formatsLogger = app.get("env") === "development" ? "dev" : "short";
   app.use(logger(formatsLogger));
-  app.use(cors());
+  app.use(cors({ origin: "*" }));
   app.use(express.json());
+  app.use(express.static("public"));
   app.use(morgan("combined"));
 }
 
