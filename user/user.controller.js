@@ -17,6 +17,7 @@ async function signUp(req, res) {
     const user = await User.create({
       ...body,
       password: hashedPassword,
+      avatarURL: req.file.fileName,
     });
     res.json(user);
   } catch (error) {
@@ -90,10 +91,34 @@ async function updateUserSubscription(req, res) {
   }
 }
 
+async function updateUserAvatar(req, res) {
+  try {
+    const {
+      user: { _id },
+      file,
+    } = req;
+
+    if (!file) {
+      return res.status(401).send("Avatar is required");
+    }
+    console.log(`file`, file);
+
+    const body = { avatarURL: file.filename };
+
+    await User.findByIdAndUpdate(_id, body, {
+      new: true,
+    });
+    return res.status(200).send({ avatarURL: file.filename });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+}
+
 module.exports = {
   login,
   signUp,
   logout,
   getCurrentUser,
   updateUserSubscription,
+  updateUserAvatar,
 };

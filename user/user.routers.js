@@ -7,10 +7,18 @@ const {
   updateSubscriptionSchema,
 } = require("./user.schema");
 const { autorize } = require("./auth.middleware");
+const { upload } = require("../services/multer");
+const { compressImage } = require("../services/compress");
 
 const router = Router();
 
-router.post("/signup", validate(signUpSchema), UserController.signUp);
+router.post(
+  "/signup",
+  upload.single("avatarURL"),
+  compressImage,
+  validate(signUpSchema),
+  UserController.signUp
+);
 router.post("/login", validate(loginSchema), UserController.login);
 router.post("/logout", autorize, UserController.logout);
 router.get("/current", autorize, UserController.getCurrentUser);
@@ -19,6 +27,13 @@ router.patch(
   autorize,
   validate(updateSubscriptionSchema),
   UserController.updateUserSubscription
+);
+router.patch(
+  "/avatars",
+  autorize,
+  upload.single("avatarURL"),
+  compressImage,
+  UserController.updateUserAvatar
 );
 
 module.exports = router;
