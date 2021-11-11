@@ -5,6 +5,7 @@ const {
   signUpSchema,
   loginSchema,
   updateSubscriptionSchema,
+  verifyUserSchema,
 } = require("./user.schema");
 const { autorize } = require("./auth.middleware");
 const { upload } = require("../services/multer");
@@ -34,6 +35,13 @@ router.patch(
   upload.single("avatarURL"),
   compressImage,
   UserController.updateUserAvatar
+);
+router.get("/verify/:verificationToken", UserController.verificationToken);
+
+router.post(
+  "/verify",
+  validate(verifyUserSchema),
+  UserController.sendRepeatedEmail
 );
 
 module.exports = router;
