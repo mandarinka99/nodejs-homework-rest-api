@@ -4,10 +4,13 @@ const dotenv = require("dotenv");
 const morgan = require("morgan");
 const logger = require("morgan");
 const cors = require("cors");
+const sgMail = require("@sendgrid/mail");
+
 const contactRouter = require("./contact/contact.routers");
 const userRouter = require("./user/user.routers");
 
 dotenv.config();
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const PORT = process.env.PORT || 3031;
 const MONGO_URL = process.env.MONGO_URL;
